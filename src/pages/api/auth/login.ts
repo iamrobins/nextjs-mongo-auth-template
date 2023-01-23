@@ -1,8 +1,8 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import clientPromise, { dbName } from "lib/mongodb";
 import { authCollection, User } from "collections";
-import jwt from "jsonwebtoken";
-import { matchPasswords } from "utils/auth";
+import { matchPasswords } from "helpers/auth";
+import { SignJWT } from "jose";
 
 type UserLoginBody = {
   email: string;
@@ -32,17 +32,18 @@ export default async function handler(
           .status(401)
           .json({ success: false, message: "Incorrect password" });
 
-      const token = jwt.sign(
-        { id: user._id, scope: user.scope },
-        process.env.JWT_SECRET ? process.env.JWT_SECRET : "",
-        { expiresIn: process.env.JWT_EXPIRE }
-      );
+      const token = await new SignJWT({ id: user._id, scope: user.scope })
+        .setProtectedHeader({ alg: "HS256" })
+        .setIssuedAt()
+        .setIssuer("nextjs-mongo-auth-template")
+        .setExpirationTime(process.env.JWT_EXPIRE)
+        .sign(new TextEncoder().encode(process.env.JWT_SECRET));
 
       res.setHeader(
         "set-cookie",
         `token=${token}; path=/; samesite=lax; httponly;`
       );
-      res.redirect("/");
+      res.status(200).json({ success: true });
       break;
     default:
       res
