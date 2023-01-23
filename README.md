@@ -28,6 +28,8 @@ Inside root folder / create .env.local file and add the following entries
 ```bash
 NODE_ENV=development
 MONGODB_URI=mongodb+srv://<username>:<password>@<url>/<db_name>
+JWT_SECRET=YOU_SECRET_KEY
+JWT_EXPIRE=1h
 ```
 
 ## Learn More
