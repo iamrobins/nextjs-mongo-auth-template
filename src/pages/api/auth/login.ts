@@ -2,7 +2,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import clientPromise, { dbName } from "lib/mongodb";
 import { authCollection, User } from "collections";
 import jwt from "jsonwebtoken";
-import { matchPasswords } from "./utils";
+import { matchPasswords } from "utils/auth";
 
 type UserLoginBody = {
   email: string;
